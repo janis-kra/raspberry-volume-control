@@ -11,9 +11,11 @@ const log = (error, stdout, stderr) => {
 
 const max = 400;
 const min = -10200;
-const normalize = volume => ((max - min) * volume) - max;
+const normalize = volume => ((max - min) * volume) + min;
 
-let currentVolume = 0;
+let currentVolume = min;
+
+const getVolume = () => ((currentVolume - min) / (max - min));
 
 const setVolume = (volume) => {
   if (typeof volume !== 'number') {
@@ -31,7 +33,7 @@ const setVolume = (volume) => {
 
   exec(`amixer cset numid=1 -- ${normalized}`, log);
   currentVolume = normalized;
-  return currentVolume;
+  return getVolume();
 };
 
 module.exports = {
@@ -41,6 +43,6 @@ module.exports = {
   down: () => setVolume(),
   mute: () => setVolume(0),
   unmute: () => setVolume(1),
-  get: () => currentVolume,
+  get: () => getVolume(),
   set: volume => setVolume(volume)
 };
